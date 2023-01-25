@@ -19,6 +19,10 @@ const jsFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/app.js`
 );
+const testFilePath = path.resolve(
+  path.dirname(__filename),
+  `${frontendDirectoryLocation}/random.txt`
+);
 
 const requestListener = (req, res) => {
   if (req.url === '/' && req.method === 'GET') {
@@ -48,6 +52,16 @@ const requestListener = (req, res) => {
         res.end('Error loading JavaScript');
       } else {
         res.writeHead(200, { 'Content-Type': 'application/javascript' });
+        res.end(data);
+      }
+    });
+  } else if (req.url === '/get-file' && req.method === 'GET') {
+    fs.readFile(testFilePath, 'utf8', (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Error loading text file');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end(data);
       }
     });
