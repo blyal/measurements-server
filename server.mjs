@@ -19,10 +19,7 @@ const jsFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/app.js`
 );
-const testFilePath = path.resolve(
-  path.dirname(__filename),
-  `${frontendDirectoryLocation}/random.txt`
-);
+const testFilePath = path.resolve(path.dirname(__filename), `./random.txt`);
 
 const requestListener = (req, res) => {
   if (req.url === '/' && req.method === 'GET') {
