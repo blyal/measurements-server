@@ -42,6 +42,25 @@ const requestListener = (req, res) => {
   } else if (req.url === '/downlink' && req.method === 'POST') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('Downlink response');
+  } else if (req.url === '/append-data' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      if (!fs.existsSync('data.csv')) {
+        const header = `${dataColumnTitles.testLabel},${dataColumnTitles.remoteEndpoint},${dataColumnTitles.testLocalStartTime},${dataColumnTitles.timeElapsed},${dataColumnTitles.ICMPTrialsAttempted},${dataColumnTitles.successfulICMPTrials},${dataColumnTitles.latency},${dataColumnTitles.minRTT},${dataColumnTitles.maxRTT},${dataColumnTitles.packetLossRatio},${dataColumnTitles.advertisedDataRate},${dataColumnTitles.httpUpTrialsAttempted},${dataColumnTitles.successfulHttpUpTrials},${dataColumnTitles.meanSuccessHttpUpTime},${dataColumnTitles.minSuccessHttpUpTime},${dataColumnTitles.maxSuccessHttpUpTime},${dataColumnTitles.uplinkThroughput},${dataColumnTitles.uplinkUnsuccessfulFileAccess},${dataColumnTitles.httpDownTrialsAttempted},${dataColumnTitles.successfulHttpDownTrials},${dataColumnTitles.meanSuccessHttpDownTime},${dataColumnTitles.minSuccessHttpDownTime},${dataColumnTitles.maxSuccessHttpDownTime},${dataColumnTitles.downlinkThroughput},${dataColumnTitles.downlinkUnsuccessfulFileAccess}\n`;
+        fs.writeFileSync('data.csv', header);
+      }
+      const parsedBody = JSON.parse(body);
+
+      const csvRow = `${parsedBody.testLabel},${parsedBody.remoteEndpoint},"${parsedBody.testLocalStartTime}",${parsedBody.timeElapsed},${parsedBody.ICMPTrialsAttempted},${parsedBody.successfulICMPTrials},${parsedBody.latency},${parsedBody.minRTT},${parsedBody.maxRTT},${parsedBody.packetLossRatio},${parsedBody.advertisedDataRate},${parsedBody.httpUpTrialsAttempted},${parsedBody.successfulHttpUpTrials},${parsedBody.meanSuccessHttpUpTime},${parsedBody.minSuccessHttpUpTime},${parsedBody.maxSuccessHttpUpTime},${parsedBody.uplinkThroughput},${parsedBody.uplinkUnsuccessfulFileAccess},${parsedBody.httpDownTrialsAttempted},${parsedBody.successfulHttpDownTrials},${parsedBody.meanSuccessHttpDownTime},${parsedBody.minSuccessHttpDownTime},${parsedBody.maxSuccessHttpDownTime},${parsedBody.downlinkThroughput},${parsedBody.downlinkUnsuccessfulFileAccess}\n`;
+
+      fs.appendFile('data.csv', csvRow, function (err) {
+        if (err) throw err;
+      });
+      res.end('Added data to CSV');
+    });
   } else {
     res.statusCode = 404;
     res.end('Not found');
@@ -59,6 +78,34 @@ function provider(res, filepath, contentType, contentTypeHeader, encoding) {
     }
   });
 }
+
+const dataColumnTitles = {
+  testLabel: 'Test Label',
+  remoteEndpoint: 'Remote Endpoint',
+  testLocalStartTime: 'Tests Started (local time)',
+  timeElapsed: 'Time Elapsed',
+  ICMPTrialsAttempted: 'ICMP Trials Attempted',
+  successfulICMPTrials: 'ICMP Trials Successful',
+  latency: 'Latency (ms)',
+  minRTT: 'Min RTT (ms)',
+  maxRTT: 'Max RTT (ms)',
+  packetLossRatio: 'Packet Loss Ratio (%)',
+  advertisedDataRate: 'Advertised Data Rate (Mb/s)',
+  httpUpTrialsAttempted: 'Uplink Trials Attempted',
+  successfulHttpUpTrials: 'Uplink Trials Successful',
+  meanSuccessHttpUpTime: 'Mean Time per successful uplink trial (ms)',
+  minSuccessHttpUpTime: 'Min successful uplink trial time (ms)',
+  maxSuccessHttpUpTime: 'Max successful uplink trial time (ms)',
+  uplinkThroughput: 'Uplink Throughput (%)',
+  uplinkUnsuccessfulFileAccess: 'Uplink Unsuccessful file access ratio (%)',
+  httpDownTrialsAttempted: 'Downlink Trials Attempted',
+  successfulHttpDownTrials: 'Downlink Trials Successful',
+  meanSuccessHttpDownTime: 'Mean Time per successful downlink trial (ms)',
+  minSuccessHttpDownTime: 'Min successful downlink trial time (ms)',
+  maxSuccessHttpDownTime: 'Max successful downlink trial time (ms)',
+  downlinkThroughput: 'Downlink Throughput (%)',
+  downlinkUnsuccessfulRatio: 'Downlink Unsuccessful file access ratio (%)',
+};
 
 server.on('request', requestListener);
 
