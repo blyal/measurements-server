@@ -23,6 +23,7 @@ const htmlFilePath = isDev
     )
   : path.join(process.cwd(), frontendDirectoryLocation, 'index.html');
 console.log('HTML FILE PATH:', htmlFilePath);
+console.log('WORKING DIRECTORY: ', process.cwd());
 const cssFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/styles.css`
