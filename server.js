@@ -1,8 +1,13 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config();
 
 const server = http.createServer();
+
+const isDev = process.env.NODE_ENV === 'development';
+//TODO: replace with const serverUrl = isDev ? 'http://localhost:1414' : liveURL;
+const serverUrl = 'http://localhost:1414';
 
 const frontendDirectoryLocation = '../measurements–frontend';
 const htmlFilePath = path.resolve(
@@ -17,7 +22,8 @@ const jsFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/app.js`
 );
-const testFilePath = path.resolve(__dirname, './random.txt');
+const textFilePath = path.resolve(__dirname, './random.txt');
+const dataFilePath = path.resolve(__dirname, './data.csv');
 
 const requestListener = (req, res) => {
   if (req.url === '/' && req.method === 'GET') {
@@ -27,7 +33,16 @@ const requestListener = (req, res) => {
   } else if (req.url === '/app.js' && req.method === 'GET') {
     provider(res, jsFilePath, 'JavaScript', 'application/javascript');
   } else if (req.url === '/get-file' && req.method === 'GET') {
-    provider(res, testFilePath, 'text file', 'text/plain', 'utf8');
+    provider(res, textFilePath, 'text file', 'text/plain', 'utf8');
+  } else if (req.url === '/download-data' && req.method === 'GET') {
+    provider(
+      res,
+      dataFilePath,
+      'CSV file',
+      'text/csv',
+      null,
+      'attachment; filename="data.csv'
+    );
   } else if (req.url === '/uplink' && req.method === 'POST') {
     let body = [];
     req
@@ -67,13 +82,35 @@ const requestListener = (req, res) => {
   }
 };
 
-function provider(res, filepath, contentType, contentTypeHeader, encoding) {
+function provider(
+  res,
+  filepath,
+  contentType,
+  contentTypeHeader,
+  encoding,
+  contentDispositionHeader = 'inline'
+) {
   fs.readFile(filepath, encoding, (err, data) => {
     if (err) {
       res.writeHead(500, { 'Content-Type': 'text/plain' });
       res.end(`Error loading ${contentType}`);
+    } else if (contentType === 'HTML') {
+      const urlScriptTag = `<script>window.serverUrl = '${serverUrl}'</script>`;
+      data = data
+        .toString()
+        .replace(
+          '<script src="app.js">',
+          `${urlScriptTag}\n<script src="app.js">`
+        );
+      res.writeHead(200, {
+        'Content-Type': contentTypeHeader,
+      });
+      res.end(data);
     } else {
-      res.writeHead(200, { 'Content-Type': contentTypeHeader });
+      res.writeHead(200, {
+        'Content-Type': contentTypeHeader,
+        'Content-Disposition': contentDispositionHeader,
+      });
       res.end(data);
     }
   });
@@ -110,5 +147,5 @@ const dataColumnTitles = {
 server.on('request', requestListener);
 
 server.listen(1414, () => {
-  console.log('Server is running on http://localhost:1414');
+  console.log(`Server is running on ${serverUrl}`);
 });
