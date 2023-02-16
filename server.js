@@ -22,6 +22,10 @@ const htmlFilePath = isDev
       `${frontendDirectoryLocation}/index.html`
     )
   : path.join(process.cwd(), frontendDirectoryLocation, 'index.html');
+fs.chmod(htmlFilePath, 0o666, (err) => {
+  if (err) throw err;
+  console.log('index.html permissions changed');
+});
 console.log('HTML FILE PATH:', htmlFilePath);
 console.log('WORKING DIRECTORY: ', process.cwd());
 const cssFilePath = path.resolve(
