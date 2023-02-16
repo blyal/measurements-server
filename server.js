@@ -6,8 +6,9 @@ require('dotenv').config();
 const server = http.createServer();
 
 const isDev = process.env.NODE_ENV === 'development';
-//TODO: replace with const serverUrl = isDev ? 'http://localhost:1414' : liveURL;
-const serverUrl = 'http://localhost:1414';
+const serverUrl = isDev
+  ? 'http://localhost:1414'
+  : 'https://measurementsnsl.azurewebsites.net';
 
 const frontendDirectoryLocation = '../measurements–frontend';
 const htmlFilePath = path.resolve(
@@ -146,6 +147,6 @@ const dataColumnTitles = {
 
 server.on('request', requestListener);
 
-server.listen(1414, () => {
+server.listen(process.env.PORT || 1414, () => {
   console.log(`Server is running on ${serverUrl}`);
 });
