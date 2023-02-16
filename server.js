@@ -15,12 +15,12 @@ fs.chmod('server.js', 0o666, (err) => {
   console.log('server.js permissions changed');
 });
 
-const frontendDirectoryLocation = './measurements–frontend';
+const frontendDirectoryLocation = './measurements-frontend';
 const htmlFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/index.html`
 );
-console.log(htmlFilePath);
+console.log('HTML FILE PATH:', htmlFilePath);
 const cssFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/styles.css`
