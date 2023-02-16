@@ -10,6 +10,11 @@ const serverUrl = isDev
   ? 'http://localhost:1414'
   : 'https://measurementsnsl.azurewebsites.net';
 
+fs.chmod('server.js', 0o666, (err) => {
+  if (err) throw err;
+  console.log('server.js permissions changed');
+});
+
 const frontendDirectoryLocation = './measurements–frontend';
 const htmlFilePath = path.resolve(
   path.dirname(__filename),
