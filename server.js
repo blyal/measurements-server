@@ -16,10 +16,12 @@ fs.chmod('server.js', 0o666, (err) => {
 });
 
 const frontendDirectoryLocation = './measurements-frontend';
-const htmlFilePath = path.resolve(
-  path.dirname(__filename),
-  `${frontendDirectoryLocation}/index.html`
-);
+const htmlFilePath = isDev
+  ? path.resolve(
+      path.dirname(__filename),
+      `${frontendDirectoryLocation}/index.html`
+    )
+  : path.join(process.cwd(), frontendDirectoryLocation, 'index.html');
 console.log('HTML FILE PATH:', htmlFilePath);
 const cssFilePath = path.resolve(
   path.dirname(__filename),
