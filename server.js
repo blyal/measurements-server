@@ -10,11 +10,12 @@ const serverUrl = isDev
   ? 'http://localhost:1414'
   : 'https://measurementsnsl.azurewebsites.net';
 
-const frontendDirectoryLocation = '../measurements–frontend';
+const frontendDirectoryLocation = './measurements–frontend';
 const htmlFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/index.html`
 );
+console.log(htmlFilePath);
 const cssFilePath = path.resolve(
   path.dirname(__filename),
   `${frontendDirectoryLocation}/styles.css`
